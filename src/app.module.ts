@@ -7,6 +7,9 @@ import { AppService } from './app.service';
 import { User } from './user/entities/user.entity'; // Adjust path as needed
 import { Role } from './user/entities/role.entity'; // Adjust path as needed
 import { Permission } from './user/entities/permission.entity'; // Adjust path as needed
+import { UserModule } from './user/user.module';
+import { UserController } from './user/user.controller';
+import { UserService } from './user/user.service';
 
 // --- Potentially other module imports (e.g., UserModule later) ---
 
@@ -36,12 +39,12 @@ import { Permission } from './user/entities/permission.entity'; // Adjust path a
         // migrations: [__dirname + '/../database/migrations/*{.ts,.js}'], // Path to migrations
         // cli: { migrationsDir: 'src/database/migrations' } // Path for CLI
       }),
-    }),
+    }), UserModule,
 
     // --- Add your UserModule here later ---
     // UserModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, UserController],
+  providers: [AppService, UserService],
 })
 export class AppModule {}
