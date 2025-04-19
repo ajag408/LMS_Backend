@@ -12,7 +12,11 @@ import {
     BadRequestException,
     HttpStatus,
     HttpCode,
+    UseGuards
   } from '@nestjs/common';
+  import { AuthGuard } from '@nestjs/passport'; // This will be provided by the auth team
+  import { RolesGuard } from '../common/guards/roles.guard';
+  import { Roles } from '../common/decorators/roles.decorator';
   import { UserService } from './user.service';
   import {
     CreateUserDto,
@@ -23,10 +27,12 @@ import {
   } from './dto';
   
   @Controller('users')
+  @UseGuards(AuthGuard('jwt'), RolesGuard) // Apply guards to all endpoints
   export class UserController {
     constructor(private readonly userService: UserService) {}
   
     @Post()
+    @Roles('admin') // Only admins can create users
     @HttpCode(HttpStatus.CREATED)
     async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
       try {
@@ -40,11 +46,13 @@ import {
     }
   
     @Get()
+    @Roles('admin', 'instructor') // Admins and instructors can list users
     async findAll(@Query() paginationQuery: PaginationQueryDto) {
       return this.userService.findAll(paginationQuery);
     }
   
     @Get(':id')
+    @Roles('admin', 'instructor') // Admins and instructors can view users
     async findOne(@Param('id') id: string): Promise<UserResponseDto> {
       const user = await this.userService.findOne(id);
       if (!user) {
@@ -54,6 +62,7 @@ import {
     }
   
     @Patch(':id')
+    @Roles('admin') // Only admins can update users
     async update(
       @Param('id') id: string,
       @Body() updateUserDto: UpdateUserDto,
@@ -69,6 +78,7 @@ import {
     }
   
     @Delete(':id')
+    @Roles('admin') // Only admins can delete users
     @HttpCode(HttpStatus.NO_CONTENT)
     async remove(@Param('id') id: string): Promise<void> {
       try {
